@@ -1,0 +1,9 @@
+package GKH;
+
+public class Khachhang {
+
+	public Khachhang() {
+		// TODO Auto-generated constructor stub
+	}
+
+}

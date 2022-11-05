@@ -1,0 +1,10 @@
+package GKH;
+
+public class Khachhang {
+	char SoTK;
+	char Hoten;
+	char GT;
+	char Diachi;
+	char Sodu;
+	
+}

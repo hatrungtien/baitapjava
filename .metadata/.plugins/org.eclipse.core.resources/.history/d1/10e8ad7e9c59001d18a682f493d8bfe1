@@ -1,0 +1,254 @@
+package Exam;
+
+import java.awt.EventQueue;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JButton;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.DefaultComboBoxModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+public class GUI extends JFrame {
+
+	private JPanel contentPane;
+	private JTextField txt_radius;
+	private JTextField txt_height;
+	private JTextField txt_area;
+	private JTextField txt_volume;
+	private JTable table;
+	DefaultTableModel model = new DefaultTableModel();
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GUI frame = new GUI();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public Connection getConnection() {
+		Connection connection = null;
+		String URL = "jdbc:mysql://localhost:3306/thijava";
+		String user = "root";
+		String pass = "";
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			connection = DriverManager.getConnection(URL,user,pass);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return connection;
+	}
+	
+	public ArrayList<Cylinder> get() {
+		Connection connection = getConnection();
+		String sql = "select * from tbCylinder";
+		ArrayList<Cylinder> list = new ArrayList<>();
+		
+		try {
+			PreparedStatement stmt = connection.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				Cylinder cylinder = new Cylinder();
+				cylinder.setRadius(rs.getDouble("radius"));
+				cylinder.setColor(rs.getString("color"));
+				cylinder.setHeight(rs.getDouble("height"));
+				list.add(cylinder);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return list;
+	}
+	
+	public void load() {
+		ArrayList<Cylinder> list = new ArrayList<>();
+		list = get();
+		model.setRowCount(0);
+		Object[] row = new Object[5];
+		for(int i = 0; i<list.size(); i++) {
+			row[0] = list.get(i).getRadius();
+			row[1] = list.get(i).getColor();
+			row[2] = list.get(i).getHeight();
+			row[3] = list.get(i).getArea();
+			row[4] = list.get(i).getVolume();
+			model.addRow(row);
+		}
+		table.setModel(model);
+	}
+	
+	public void initTable() {
+		model.setColumnIdentifiers(new String[] {
+				"radius", "color", "height","area","volume"
+			});
+	}
+	
+	public boolean delete(Cylinder cylinder) {
+		Connection connection = getConnection();
+		String Sql = "Delete from tbCylinder where radius = ? and color = ? and height = ?";
+		try {
+			PreparedStatement stmt = connection.prepareStatement(Sql);
+			stmt.setDouble(1, cylinder.getRadius());
+			stmt.setString(2, cylinder.getColor());
+			stmt.setDouble(3, cylinder.getHeight());
+			stmt.executeUpdate();
+			return true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			return false;
+		}
+	}
+	
+	public boolean insert(Cylinder cylinder) {
+		Connection connection = getConnection();
+		String sql = "Insert Into tbcylinder(radius, color, height) values (?,?,?)";
+		try {
+			PreparedStatement stmt = connection.prepareStatement(sql);
+			stmt.setDouble(1, cylinder.getRadius());
+			stmt.setString(2, cylinder.getColor());
+			stmt.setDouble(3, cylinder.getHeight());
+			stmt.executeUpdate();
+			return true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			return false;
+		}
+	}
+	/**
+	 * Create the frame.
+	 */
+	public GUI() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JLabel lblNewLabel = new JLabel("radius:");
+		lblNewLabel.setBounds(10, 10, 72, 13);
+		contentPane.add(lblNewLabel);
+		
+		JLabel lblHeight = new JLabel("height:");
+		lblHeight.setBounds(10, 70, 72, 13);
+		contentPane.add(lblHeight);
+		
+		JLabel lblArea = new JLabel("area:");
+		lblArea.setBounds(10, 103, 72, 13);
+		contentPane.add(lblArea);
+		
+		JLabel lblVolume = new JLabel("volume:");
+		lblVolume.setBounds(10, 133, 72, 13);
+		contentPane.add(lblVolume);
+		
+		JLabel lblColor = new JLabel("color:");
+		lblColor.setBounds(10, 37, 72, 13);
+		contentPane.add(lblColor);
+		
+		txt_radius = new JTextField();
+		txt_radius.setBounds(60, 7, 115, 19);
+		contentPane.add(txt_radius);
+		txt_radius.setColumns(10);
+		
+		txt_height = new JTextField();
+		txt_height.setColumns(10);
+		txt_height.setBounds(60, 67, 115, 19);
+		contentPane.add(txt_height);
+		
+		txt_area = new JTextField();
+		txt_area.setColumns(10);
+		txt_area.setBounds(60, 100, 115, 19);
+		contentPane.add(txt_area);
+		
+		txt_volume = new JTextField();
+		txt_volume.setColumns(10);
+		txt_volume.setBounds(60, 130, 115, 19);
+		contentPane.add(txt_volume);
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"red", "blue", "green", "yellow", "pink"}));
+		comboBox.setBounds(60, 33, 115, 21);
+		contentPane.add(comboBox);
+		
+		JLabel lbToString = new JLabel("");
+		lbToString.setBounds(216, 70, 220, 13);
+		contentPane.add(lbToString);
+		
+		JButton btnNewButton = new JButton("Sửa");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Cylinder cylinder = new Cylinder();
+				cylinder.setRadius(Double.parseDouble(txt_radius.getText()));
+				cylinder.setColor(comboBox.getSelectedItem().toString());
+				cylinder.setHeight(Double.parseDouble(txt_height.getText()));
+				(cylinder);
+				load();
+				
+			}
+		});
+		btnNewButton.setBounds(265, 45, 85, 21);
+		contentPane.add(btnNewButton);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 156, 416, 107);
+		contentPane.add(scrollPane);
+		
+		table = new JTable();
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = table.getSelectedRow();
+				if(row>=0) {
+					txt_radius.setText(table.getValueAt(row, 0).toString());
+					comboBox.setSelectedItem(table.getValueAt(row, 1).toString());
+					txt_height.setText(table.getValueAt(row, 2).toString());
+					txt_area.setText(table.getValueAt(row, 3).toString());
+					txt_volume.setText(table.getValueAt(row, 4).toString());
+					
+				}
+			}
+		});
+		scrollPane.setViewportView(table);
+		
+//		JButton btnThm = new JButton("Thêm");
+//		btnThm.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				Cylinder cylinder = new Cylinder();
+//				cylinder.setRadius(Double.parseDouble(txt_radius.getText()));
+//				cylinder.setColor(comboBox.getSelectedItem().toString());
+//				cylinder.setHeight(Double.parseDouble(txt_height.getText()));
+//				insert(cylinder);
+//				load();
+//				
+//			}
+//		});
+//		btnThm.setBounds(265, 99, 85, 21);
+//		contentPane.add(btnThm);
+		initTable();
+		load();
+	}
+}
+

@@ -1,0 +1,19 @@
+package GKH;
+
+public class Khachhang {
+	public Khachhang(char soTK, char hoten, char gT, char diachi, char sodu) {
+		super();
+		SoTK = soTK;
+		Hoten = hoten;
+		GT = gT;
+		Diachi = diachi;
+		Sodu = sodu;
+	}
+	char SoTK;
+	char Hoten;
+	char GT;
+	char Diachi;
+	char Sodu;
+	
+}
+

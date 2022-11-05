@@ -1,0 +1,12 @@
+package GKH;
+
+public class Khachhang {
+	 private char SoTK;
+	 
+	 private char Hoten;
+	 private char GT;
+	 private char Diachi;
+	 private char Sodu;
+	
+}
+
